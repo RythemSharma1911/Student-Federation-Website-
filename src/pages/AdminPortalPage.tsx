@@ -166,18 +166,6 @@ export const AdminPortalPage: React.FC = () => {
               <span>Unlock Leadership Desk</span>
             </button>
           </form>
-
-          <div className="pt-4 border-t border-stone-100 text-center">
-            <a
-              href={firestoreConsoleUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-[#651D32] hover:underline font-semibold"
-            >
-              <span>Open Firebase Cloud Console Directly</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
         </div>
       </div>
     );
