@@ -1,0 +1,131 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'seemavinay1920@gmail.com';
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Validation for Issue Reports
+    function isValidIssueReport(data) {
+      return data.keys().hasAll(['category', 'description', 'is_anonymous', 'privacy_acknowledged', 'status', 'created_at']) &&
+             data.category in ['Cyberbullying', 'Online Blackmail', 'Fake Accounts or Impersonation', 'Online Harassment', 'Other Student-Related Concerns'] &&
+             data.description is string && data.description.size() > 0 && data.description.size() <= 5000 &&
+             data.is_anonymous is bool &&
+             data.privacy_acknowledged == true &&
+             data.status in ['received', 'under_review', 'resolved'] &&
+             data.created_at is string &&
+             (!('short_title' in data) || (data.short_title is string && data.short_title.size() <= 150)) &&
+             (!('submitter_name' in data) || data.submitter_name == null || (data.submitter_name is string && data.submitter_name.size() <= 100)) &&
+             (!('submitter_email' in data) || data.submitter_email == null || (data.submitter_email is string && data.submitter_email.size() <= 100)) &&
+             (!('submitter_phone' in data) || data.submitter_phone == null || (data.submitter_phone is string && data.submitter_phone.size() <= 30));
+    }
+
+    // Validation for Membership Applications
+    function isValidMembershipApplication(data) {
+      return data.keys().hasAll(['full_name', 'email', 'school_college', 'city', 'areas_of_interest', 'privacy_acknowledged', 'status', 'created_at']) &&
+             data.full_name is string && data.full_name.size() > 0 && data.full_name.size() <= 120 &&
+             data.email is string && data.email.size() > 0 && data.email.size() <= 120 &&
+             data.school_college is string && data.school_college.size() > 0 && data.school_college.size() <= 150 &&
+             data.city is string && data.city.size() > 0 && data.city.size() <= 100 &&
+             data.areas_of_interest is list && data.areas_of_interest.size() > 0 && data.areas_of_interest.size() <= 10 &&
+             data.privacy_acknowledged == true &&
+             data.status in ['pending', 'reviewed', 'accepted', 'archived'] &&
+             data.created_at is string &&
+             (!('why_join' in data) || data.why_join == null || (data.why_join is string && data.why_join.size() <= 1000));
+    }
+
+    // Validation for Notices
+    function isValidNotice(data) {
+      return data.keys().hasAll(['title', 'publication_date', 'short_description', 'category', 'is_pinned', 'is_published', 'created_at']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.publication_date is string &&
+             data.short_description is string && data.short_description.size() <= 500 &&
+             data.category is string &&
+             data.is_pinned is bool &&
+             data.is_published is bool &&
+             data.created_at is string &&
+             (!('full_content' in data) || data.full_content == null || (data.full_content is string && data.full_content.size() <= 10000)) &&
+             (!('document_name' in data) || data.document_name == null || (data.document_name is string && data.document_name.size() <= 200));
+    }
+
+    // Validation for Student Suggestions
+    function isValidStudentSuggestion(data) {
+      return data.keys().hasAll(['title', 'category', 'description', 'privacy_acknowledged', 'status', 'created_at']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 150 &&
+             data.category in ['Education', 'Student Welfare', 'Cyber Awareness', 'Events & Activities', 'Community Initiatives', 'Other'] &&
+             data.description is string && data.description.size() > 0 && data.description.size() <= 3000 &&
+             data.privacy_acknowledged == true &&
+             data.status is string &&
+             data.created_at is string &&
+             (!('submitter_name' in data) || data.submitter_name == null || (data.submitter_name is string && data.submitter_name.size() <= 100)) &&
+             (!('submitter_email' in data) || data.submitter_email == null || (data.submitter_email is string && data.submitter_email.size() <= 120));
+    }
+
+    // Validation for Contact Messages
+    function isValidContactMessage(data) {
+      return data.keys().hasAll(['subject', 'message', 'privacy_acknowledged', 'created_at']) &&
+             data.subject is string && data.subject.size() > 0 && data.subject.size() <= 150 &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 3000 &&
+             data.privacy_acknowledged == true &&
+             data.created_at is string &&
+             (!('name' in data) || data.name == null || (data.name is string && data.name.size() <= 100)) &&
+             (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 120));
+    }
+
+    // 1. Issue Reports: Public can only insert. Read/Delete restricted to admin.
+    match /issue_reports/{reportId} {
+      allow create: if isValidId(reportId) && isValidIssueReport(incoming());
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 2. Membership Applications: Public can only insert. Read/Delete restricted to admin.
+    match /membership_applications/{applicationId} {
+      allow create: if isValidId(applicationId) && isValidMembershipApplication(incoming());
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 3. Notices: Public can read published notices. Admin has full control.
+    match /notices/{noticeId} {
+      allow get, list: if resource.data.is_published == true;
+      allow create: if isAdmin() && isValidId(noticeId) && isValidNotice(incoming());
+      allow update: if isAdmin() && isValidNotice(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // 4. Student Suggestions: Public can only insert. Read/Delete restricted to admin.
+    match /student_suggestions/{suggestionId} {
+      allow create: if isValidId(suggestionId) && isValidStudentSuggestion(incoming());
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 5. Contact Messages: Public can only insert. Read/Delete restricted to admin.
+    match /contact_messages/{messageId} {
+      allow create: if isValidId(messageId) && isValidContactMessage(incoming());
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Test connection doc
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+  }
+}

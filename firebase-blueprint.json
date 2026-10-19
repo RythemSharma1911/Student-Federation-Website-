@@ -1,0 +1,230 @@
+{
+  "entities": {
+    "IssueReport": {
+      "title": "IssueReport",
+      "description": "Private student concern or grievance report submitted anonymously or identified",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "Cyberbullying",
+            "Online Blackmail",
+            "Fake Accounts or Impersonation",
+            "Online Harassment",
+            "Other Student-Related Concerns"
+          ]
+        },
+        "short_title": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "is_anonymous": {
+          "type": "boolean"
+        },
+        "submitter_name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "submitter_email": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "submitter_phone": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "privacy_acknowledged": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["received", "under_review", "resolved"]
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": ["category", "description", "is_anonymous", "privacy_acknowledged", "status", "created_at"]
+    },
+    "MembershipApplication": {
+      "title": "MembershipApplication",
+      "description": "Student membership application to join the federation as member or volunteer",
+      "type": "object",
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "school_college": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "city": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "areas_of_interest": {
+          "type": "array"
+        },
+        "why_join": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "privacy_acknowledged": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "reviewed", "accepted", "archived"]
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": ["full_name", "email", "school_college", "city", "areas_of_interest", "privacy_acknowledged", "status", "created_at"]
+    },
+    "Notice": {
+      "title": "Notice",
+      "description": "Official announcement or circular issued by the federation",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "publication_date": {
+          "type": "string"
+        },
+        "short_description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "full_content": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "category": {
+          "type": "string"
+        },
+        "is_pinned": {
+          "type": "boolean"
+        },
+        "is_published": {
+          "type": "boolean"
+        },
+        "document_name": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": ["title", "publication_date", "short_description", "category", "is_pinned", "is_published", "created_at"]
+    },
+    "StudentSuggestion": {
+      "title": "StudentSuggestion",
+      "description": "Student proposal for education or community improvement",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "Education",
+            "Student Welfare",
+            "Cyber Awareness",
+            "Events & Activities",
+            "Community Initiatives",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "submitter_name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "submitter_email": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "privacy_acknowledged": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": ["title", "category", "description", "privacy_acknowledged", "status", "created_at"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "description": "General message or inquiry submitted through the contact page",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "subject": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "privacy_acknowledged": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": ["subject", "message", "privacy_acknowledged", "created_at"]
+    }
+  },
+  "firestore": {
+    "/issue_reports/{reportId}": {
+      "schema": "IssueReport",
+      "description": "Confidential student issue reports"
+    },
+    "/membership_applications/{applicationId}": {
+      "schema": "MembershipApplication",
+      "description": "Student membership and volunteer applications"
+    },
+    "/notices/{noticeId}": {
+      "schema": "Notice",
+      "description": "Official public bulletins and advisories"
+    },
+    "/student_suggestions/{suggestionId}": {
+      "schema": "StudentSuggestion",
+      "description": "Student suggestions and feedback"
+    },
+    "/contact_messages/{messageId}": {
+      "schema": "ContactMessage",
+      "description": "General contact inquiries"
+    }
+  }
+}

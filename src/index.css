@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-maroon-950: #250812;
+  --color-maroon-900: #3D101E;
+  --color-maroon-800: #4F1426;
+  --color-maroon-700: #651D32;
+  --color-maroon-600: #7E2640;
+  --color-maroon-500: #972E4D;
+  
+  --color-ivory-50: #FDFBF7;
+  --color-ivory-100: #F8F4EC;
+  --color-ivory-200: #EEE7D7;
+  --color-ivory-300: #DFD5BE;
+  
+  --color-gold-300: #E4CEA4;
+  --color-gold-400: #D4B681;
+  --color-gold-500: #C5A36A;
+  --color-gold-600: #A8864E;
+  --color-gold-700: #8A6B38;
+  
+  --color-charcoal-950: #121113;
+  --color-charcoal-900: #181719;
+  --color-charcoal-800: #242226;
+  --color-charcoal-700: #363338;
+  
+  --color-muted-grey: #77716E;
+  --color-sandstone-border: #E4DCce;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: var(--color-ivory-100);
+  color: var(--color-charcoal-900);
+  overflow-x: hidden;
+}
+
+/* Sandstone grain texture overlay helper */
+.sandstone-grain {
+  background-image: radial-gradient(rgba(197, 163, 106, 0.08) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.maroon-vignette {
+  background: radial-gradient(circle at 50% 30%, rgba(101, 29, 50, 0.4) 0%, rgba(37, 8, 18, 0.95) 85%);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F4EC;
+}
+::-webkit-scrollbar-thumb {
+  background: #C5A36A;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #651D32;
+}

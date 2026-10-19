@@ -1,0 +1,6 @@
+{
+  "name": "Students Federation of Bikaner",
+  "description": "Official digital platform of the Students Federation of Bikaner. For People. For Education. For Change.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
