@@ -37,9 +37,10 @@ export const AdminPortalPage: React.FC = () => {
   const [noticePinned, setNoticePinned] = useState(false);
   const [noticeSuccess, setNoticeSuccess] = useState(false);
 
-  const storedKey = sessionStorage.getItem('sfb_admin_key') || 'sfb_lead_2026';
+  const storedKey = sessionStorage.getItem('sfb_admin_key') || '';
 
   const loadSubmissions = async (key: string) => {
+    if (!key) return;
     setIsLoading(true);
     try {
       const res = await fetchAdminSubmissions(key);
@@ -52,23 +53,27 @@ export const AdminPortalPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && storedKey) {
       loadSubmissions(storedKey);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, storedKey]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
-    const keyToTest = passkey.trim() || 'sfb_lead_2026';
-    const isValid = await verifyAdminAccess(keyToTest, 'seemavinay1920@gmail.com');
+    const keyToTest = passkey.trim();
+    if (!keyToTest) {
+      setLoginError('Password is required. Please enter the leadership password.');
+      return;
+    }
+    const isValid = await verifyAdminAccess(keyToTest);
     if (isValid) {
       setIsAuthenticated(true);
       sessionStorage.setItem('sfb_admin_auth', 'true');
       sessionStorage.setItem('sfb_admin_key', keyToTest);
       loadSubmissions(keyToTest);
     } else {
-      setLoginError('Invalid access key. Please verify credentials.');
+      setLoginError('Invalid access password. Access denied.');
     }
   };
 
@@ -126,7 +131,7 @@ export const AdminPortalPage: React.FC = () => {
               Leadership Access Portal
             </h1>
             <p className="text-xs text-stone-600">
-              Restricted management console for authorized caseworkers and administrative review (<code className="font-mono text-stone-800">seemavinay1920@gmail.com</code>).
+              Restricted management console for authorized caseworkers and leadership review.
             </p>
           </div>
 
@@ -140,12 +145,13 @@ export const AdminPortalPage: React.FC = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label htmlFor="passkey" className="block text-xs font-bold uppercase tracking-wider text-[#181719] mb-1.5">
-                Passkey / Security Token
+                Secret Access Password
               </label>
               <input
                 id="passkey"
                 type="password"
-                placeholder="Enter leadership key (default: sfb_lead_2026)"
+                required
+                placeholder="Enter password"
                 value={passkey}
                 onChange={(e) => setPasskey(e.target.value)}
                 className="w-full px-4 py-3 bg-[#F8F4EC] border border-[#E4DCCE] rounded-lg text-sm text-[#181719] focus:ring-2 focus:ring-[#651D32] focus:outline-none font-mono"
@@ -157,7 +163,7 @@ export const AdminPortalPage: React.FC = () => {
               className="w-full py-3.5 bg-[#651D32] hover:bg-[#3D101E] text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <Unlock className="w-4 h-4 text-[#C5A36A]" />
-              <span>Authenticate Portal</span>
+              <span>Unlock Leadership Desk</span>
             </button>
           </form>
 

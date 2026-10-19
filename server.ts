@@ -36,7 +36,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
@@ -269,20 +269,19 @@ app.get('/api/notices', async (req, res) => {
 });
 
 // ====================================================================
-// EXECUTIVE ADMIN API (For seemavinay1920@gmail.com)
+// EXECUTIVE ADMIN API
 // ====================================================================
 
 // Simple secure session token for the executive portal
 const ADMIN_ACCESS_KEY = process.env.ADMIN_KEY || 'sfb_lead_2026';
 
 app.post('/api/admin/verify', (req, res) => {
-  const { key, email } = req.body;
-  const authorizedEmails = ['seemavinay1920@gmail.com'];
+  const { key } = req.body;
 
-  if ((email && authorizedEmails.includes(email.toLowerCase())) || key === ADMIN_ACCESS_KEY) {
+  if (key && typeof key === 'string' && key.trim() === ADMIN_ACCESS_KEY) {
     return res.json({ authorized: true, role: 'executive_officer' });
   }
-  return res.status(401).json({ error: 'Unauthorized access. Only official leadership may access submissions.' });
+  return res.status(401).json({ error: 'Unauthorized access. Valid password is required.' });
 });
 
 app.get('/api/admin/all-submissions', async (req, res) => {
